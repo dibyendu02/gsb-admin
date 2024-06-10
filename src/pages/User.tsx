@@ -16,10 +16,11 @@ import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
 import { getData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
+import { IoChatbubbleOutline } from "react-icons/io5";
 
 export default function User() {
   const [users, setUsers] = useState([]);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user: any = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
 
   const auth = useSelector((state: RootState) => state.auth);
@@ -37,7 +38,9 @@ export default function User() {
 
       console.log("response ", response);
       // Filter out users where isAdmin is false
-      const filteredUsers = response?.filter((user) => user.isAdmin === false);
+      const filteredUsers = response?.filter(
+        (user: any) => user.isAdmin === false
+      );
       setUsers(filteredUsers);
 
       //   setUsers(response);
@@ -105,6 +108,13 @@ export default function User() {
                 <MailIcon className="h-4 w-4" />
                 Consultation
               </Link>
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                to="/chat"
+              >
+                <IoChatbubbleOutline className="h-4 w-4" />
+                Chat
+              </Link>
             </nav>
           </div>
         </div>
@@ -171,14 +181,14 @@ export default function User() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users?.map((user) => (
-                  <TableRow key={user._id}>
+                {users?.map((user: any) => (
+                  <TableRow key={user?._id}>
                     {/* <TableCell>{consultation._id}</TableCell> */}
 
-                    <TableCell>{`${user.name}`}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phoneNumber}</TableCell>
-                    <TableCell>{user.goal}</TableCell>
+                    <TableCell>{`${user?.name}`}</TableCell>
+                    <TableCell>{user?.email}</TableCell>
+                    <TableCell>{user?.phoneNumber}</TableCell>
+                    <TableCell>{user?.goal}</TableCell>
 
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -198,7 +208,7 @@ export default function User() {
   );
 }
 
-function BellIcon(props) {
+function BellIcon(props: any) {
   return (
     <svg
       {...props}
@@ -218,7 +228,7 @@ function BellIcon(props) {
   );
 }
 
-function FileIcon(props) {
+function FileIcon(props: any) {
   return (
     <svg
       {...props}
@@ -238,7 +248,7 @@ function FileIcon(props) {
   );
 }
 
-function MailIcon(props) {
+function MailIcon(props: any) {
   return (
     <svg
       {...props}
@@ -258,7 +268,7 @@ function MailIcon(props) {
   );
 }
 
-function Package2Icon(props) {
+function Package2Icon(props: any) {
   return (
     <svg
       {...props}
@@ -279,7 +289,7 @@ function Package2Icon(props) {
   );
 }
 
-function PackageIcon(props) {
+function PackageIcon(props: any) {
   return (
     <svg
       {...props}
@@ -301,7 +311,7 @@ function PackageIcon(props) {
   );
 }
 
-function SearchIcon(props) {
+function SearchIcon(props: any) {
   return (
     <svg
       {...props}
@@ -321,7 +331,7 @@ function SearchIcon(props) {
   );
 }
 
-function ShoppingCartIcon(props) {
+function ShoppingCartIcon(props: any) {
   return (
     <svg
       {...props}
@@ -342,7 +352,7 @@ function ShoppingCartIcon(props) {
   );
 }
 
-function UsersIcon(props) {
+function UsersIcon(props: any) {
   return (
     <svg
       {...props}

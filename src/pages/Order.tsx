@@ -1,13 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenu,
-} from "@/components/ui/dropdown-menu";
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import {
   TableHead,
@@ -23,11 +15,12 @@ import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
 import { getData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
+import { IoChatbubbleOutline } from "react-icons/io5";
 
 export default function Order() {
   const [orderData, setOrderData] = useState([]);
   const [products, setProducts] = useState([]);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user: any = useSelector((state: RootState) => state.auth.user);
   const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const dispatch = useDispatch();
@@ -60,11 +53,22 @@ export default function Order() {
     getProducts();
   }, [location]);
 
-  const getProductImage = (productId) => {
-    const product = products.find((product) => product._id === productId);
+  const getProductImage = (productId: any) => {
+    const product: any = products.find(
+      (product: any) => product._id === productId
+    );
     console.log(product);
     console.log(product?.productImg);
     return product?.productImg;
+  };
+
+  const getProductName = (productId: any) => {
+    const product: any = products.find(
+      (product: any) => product._id === productId
+    );
+    console.log(product);
+    console.log(product?.name);
+    return product?.name;
   };
 
   console.log(products);
@@ -121,6 +125,13 @@ export default function Order() {
                 <MailIcon className="h-4 w-4" />
                 Consultation
               </Link>
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                to="/chat"
+              >
+                <IoChatbubbleOutline className="h-4 w-4" />
+                Chat
+              </Link>
             </nav>
           </div>
         </div>
@@ -157,7 +168,7 @@ export default function Order() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Consultation Data
+                  Order Data
                 </CardTitle>
                 <Link className="text-sm font-medium underline" to="#">
                   View All
@@ -176,6 +187,8 @@ export default function Order() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
+                  <TableHead>Products Name</TableHead>
+
                   <TableHead>Products</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
@@ -183,11 +196,16 @@ export default function Order() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orderData?.map((order) => (
-                  <TableRow key={order._id}>
-                    <TableCell>{order._id}</TableCell>
+                {orderData?.map((order: any) => (
+                  <TableRow key={order?._id}>
+                    <TableCell>{order?._id}</TableCell>
                     <TableCell>
-                      {order.products.map((product) => (
+                      {order?.products.map((product: any) => (
+                        <h1>{getProductName(product.productId)}</h1>
+                      ))}
+                    </TableCell>
+                    <TableCell>
+                      {order?.products.map((product: any) => (
                         <img
                           key={product.productId}
                           src={getProductImage(product.productId)}
@@ -196,8 +214,8 @@ export default function Order() {
                         />
                       ))}
                     </TableCell>
-                    <TableCell>{order.amount}</TableCell>
-                    <TableCell>{order.status}</TableCell>
+                    <TableCell>{order?.amount}</TableCell>
+                    <TableCell>{order?.status}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button color="red" size="sm" variant="outline">
@@ -219,7 +237,7 @@ export default function Order() {
   );
 }
 
-function BellIcon(props) {
+function BellIcon(props: any) {
   return (
     <svg
       {...props}
@@ -239,7 +257,7 @@ function BellIcon(props) {
   );
 }
 
-function FileIcon(props) {
+function FileIcon(props: any) {
   return (
     <svg
       {...props}
@@ -259,7 +277,7 @@ function FileIcon(props) {
   );
 }
 
-function MailIcon(props) {
+function MailIcon(props: any) {
   return (
     <svg
       {...props}
@@ -279,7 +297,7 @@ function MailIcon(props) {
   );
 }
 
-function Package2Icon(props) {
+function Package2Icon(props: any) {
   return (
     <svg
       {...props}
@@ -300,7 +318,7 @@ function Package2Icon(props) {
   );
 }
 
-function PackageIcon(props) {
+function PackageIcon(props: any) {
   return (
     <svg
       {...props}
@@ -322,7 +340,7 @@ function PackageIcon(props) {
   );
 }
 
-function SearchIcon(props) {
+function SearchIcon(props: any) {
   return (
     <svg
       {...props}
@@ -342,7 +360,7 @@ function SearchIcon(props) {
   );
 }
 
-function ShoppingCartIcon(props) {
+function ShoppingCartIcon(props: any) {
   return (
     <svg
       {...props}
@@ -363,7 +381,7 @@ function ShoppingCartIcon(props) {
   );
 }
 
-function UsersIcon(props) {
+function UsersIcon(props: any) {
   return (
     <svg
       {...props}

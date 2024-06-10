@@ -1,13 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenu,
-} from "@/components/ui/dropdown-menu";
+
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import {
   TableHead,
@@ -23,16 +16,17 @@ import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
 import { getData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
+import { IoChatbubbleOutline } from "react-icons/io5";
 
 export default function Consultation() {
   const [consultationData, setConsultationData] = useState([]);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user: any = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const navigate = useNavigate();
 
-  if (!user?.isAdmin || !user) {
+  if (!user || !user?.isAdmin) {
     return <Navigate to="/" />;
   }
 
@@ -107,6 +101,13 @@ export default function Consultation() {
                 <MailIcon className="h-4 w-4" />
                 Consultation
               </Link>
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                to="/chat"
+              >
+                <IoChatbubbleOutline className="h-4 w-4" />
+                Chat
+              </Link>
             </nav>
           </div>
         </div>
@@ -176,15 +177,15 @@ export default function Consultation() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {consultationData?.map((consultation) => (
-                  <TableRow key={consultation._id}>
+                {consultationData?.map((consultation: any) => (
+                  <TableRow key={consultation?._id}>
                     {/* <TableCell>{consultation._id}</TableCell> */}
 
-                    <TableCell>{`${consultation.firstName} ${consultation.lastName}`}</TableCell>
-                    <TableCell>{consultation.email}</TableCell>
-                    <TableCell>{consultation.phoneNumber}</TableCell>
+                    <TableCell>{`${consultation?.firstName} ${consultation?.lastName}`}</TableCell>
+                    <TableCell>{consultation?.email}</TableCell>
+                    <TableCell>{consultation?.phoneNumber}</TableCell>
 
-                    <TableCell>{consultation.message}</TableCell>
+                    <TableCell>{consultation?.message}</TableCell>
 
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -204,7 +205,7 @@ export default function Consultation() {
   );
 }
 
-function BellIcon(props) {
+function BellIcon(props: any) {
   return (
     <svg
       {...props}
@@ -224,7 +225,7 @@ function BellIcon(props) {
   );
 }
 
-function FileIcon(props) {
+function FileIcon(props: any) {
   return (
     <svg
       {...props}
@@ -244,7 +245,7 @@ function FileIcon(props) {
   );
 }
 
-function MailIcon(props) {
+function MailIcon(props: any) {
   return (
     <svg
       {...props}
@@ -264,7 +265,7 @@ function MailIcon(props) {
   );
 }
 
-function Package2Icon(props) {
+function Package2Icon(props: any) {
   return (
     <svg
       {...props}
@@ -285,7 +286,7 @@ function Package2Icon(props) {
   );
 }
 
-function PackageIcon(props) {
+function PackageIcon(props: any) {
   return (
     <svg
       {...props}
@@ -307,7 +308,7 @@ function PackageIcon(props) {
   );
 }
 
-function SearchIcon(props) {
+function SearchIcon(props: any) {
   return (
     <svg
       {...props}
@@ -327,7 +328,7 @@ function SearchIcon(props) {
   );
 }
 
-function ShoppingCartIcon(props) {
+function ShoppingCartIcon(props: any) {
   return (
     <svg
       {...props}
@@ -348,7 +349,7 @@ function ShoppingCartIcon(props) {
   );
 }
 
-function UsersIcon(props) {
+function UsersIcon(props: any) {
   return (
     <svg
       {...props}

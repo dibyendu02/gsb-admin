@@ -20,7 +20,6 @@ const authSlice = createSlice({
       state.isFetching = false;
       state.isAuth = true;
       state.error = false;
-      // state.user = action.payload.user;
     },
     signupFailure: (state, action) => {
       state.isFetching = false;
@@ -47,7 +46,9 @@ const authSlice = createSlice({
       state.token = null;
     },
     updateUser: (state, action) => {
-      state.user = { ...state.user, ...action.payload };
+      state.isAuth = true;
+      state.token = action.payload.token;
+      state.user = action.payload.user;
     },
   },
 });

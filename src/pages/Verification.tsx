@@ -56,6 +56,10 @@ export default function Verification() {
           // await storeData("token", response.token);
           // await storeData("userId", response.user._id);
 
+          //store token in localstorage
+          localStorage.setItem("userId", response.user._id);
+          localStorage.setItem("authToken", response.token);
+
           dispatch(verificationSuccess(response));
 
           navigate("/product");

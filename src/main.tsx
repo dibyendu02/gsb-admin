@@ -11,6 +11,7 @@ import Consultation from "./pages/Consultation";
 import Stories from "./pages/Stories";
 import User from "./pages/User";
 import Order from "./pages/Order";
+import Chat from "./pages/Chat";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/order",
     element: <Order />,
+  },
+  {
+    path: "/chat",
+    element: <Chat />,
   },
 ]);
 
