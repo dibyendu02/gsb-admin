@@ -12,6 +12,7 @@ import {
   updateUser,
 } from "@/redux/authSlice";
 import { postData, getData } from "../../global/server";
+import logo from "../assets/gsb.png";
 
 export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -60,6 +61,10 @@ export default function Login() {
 
   return (
     <div className="mx-auto max-w-[450px] min-h-screen space-y-6 flex flex-col justify-center">
+      <div className="flex justify-center">
+        <img src={logo} alt="logo" className="w-40" />
+      </div>
+
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold">Get Started as an Admin</h1>
         <p className="text-gray-500 dark:text-gray-400">
