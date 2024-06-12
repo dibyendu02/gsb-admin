@@ -11,6 +11,7 @@ import Stories from "./pages/Stories";
 import User from "./pages/User";
 import Order from "./pages/Order";
 import Chat from "./pages/Chat";
+import ContentVideos from "./pages/contentVideo";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: "/stories",
     element: <Stories />,
+  },
+  {
+    path: "/content-videos",
+    element: <ContentVideos />,
   },
   {
     path: "/user",

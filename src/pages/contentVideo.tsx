@@ -1,84 +1,55 @@
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
+import UploadContentVideoModal from "@/components/UploadContentVideoModal";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/redux/store";
+import { getData } from "../../global/server";
+import { logout } from "@/redux/authSlice";
+import SideNavbar from "@/components/SideNavbar";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
+  Table,
   TableHead,
   TableRow,
   TableHeader,
   TableCell,
   TableBody,
-  Table,
 } from "@/components/ui/table";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { useEffect, useState } from "react";
-import { getData } from "../../global/server";
-import { logout } from "@/redux/authSlice";
-import SideNavbar from "@/components/SideNavbar";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
-export default function Order() {
-  const [orderData, setOrderData] = useState([]);
-  const [products, setProducts] = useState([]);
+export default function ContentVideos() {
+  const [contentVideos, setContentVideos] = useState([]);
   const user: any = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   if (!user?.isAdmin || !user) {
     return <Navigate to="/" />;
   }
 
-  const getOrderData = async () => {
+  const getContentVideo = async () => {
     try {
-      const response = await getData("/api/order", auth.token);
-      setOrderData(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const getProducts = async () => {
-    try {
-      const response = await getData("/api/supplement", auth.token);
-      setProducts(response);
+      const response = await getData("/api/contentVideo", auth.token);
+      setContentVideos(response);
     } catch (err) {
       console.log(err);
     }
   };
 
   useEffect(() => {
-    getOrderData();
-    getProducts();
+    getContentVideo();
   }, [location]);
-
-  const getProductImage = (productId: any) => {
-    const product: any = products.find(
-      (product: any) => product._id === productId
-    );
-    console.log(product);
-    console.log(product?.productImg);
-    return product?.productImg;
-  };
-
-  const getProductName = (productId: any) => {
-    const product: any = products.find(
-      (product: any) => product._id === productId
-    );
-    console.log(product);
-    console.log(product?.name);
-    return product?.name;
-  };
-
-  console.log(products);
-  console.log(orderData);
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
-        <SideNavbar />
-      </div>
+      <SideNavbar />
       <div className="flex flex-col">
         <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-100/40 px-6 dark:bg-gray-800/40">
           <Link className="lg:hidden" to="#">
@@ -111,59 +82,61 @@ export default function Order() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Order Data
+                  Content Videos
                 </CardTitle>
                 <Link className="text-sm font-medium underline" to="#">
                   View All
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{orderData?.length}</div>
-                {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-                  +12 since last month
-                </p> */}
+                <div className="text-2xl font-bold">
+                  {contentVideos?.length}
+                </div>
               </CardContent>
             </Card>
           </div>
+          <Button onClick={toggleModal}>Upload New Content Video</Button>
+          <UploadContentVideoModal
+            isOpen={isModalOpen}
+            toggleModal={toggleModal}
+            onVideoUploaded={getContentVideo}
+          />
           <div className="border shadow-sm rounded-lg">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
-                  <TableHead>Products Name</TableHead>
-
-                  <TableHead>Products</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Video</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orderData?.map((order: any) => (
-                  <TableRow key={order?._id}>
-                    <TableCell>{order?._id}</TableCell>
+                {contentVideos?.map((content: any) => (
+                  <TableRow key={content?._id}>
+                    <TableCell>{content?._id}</TableCell>
+                    <TableCell>{content?.title}</TableCell>
+                    <TableCell>{content?.description}</TableCell>
+                    <TableCell>{content?.category}</TableCell>
                     <TableCell>
-                      {order?.products.map((product: any) => (
-                        <h1>{getProductName(product.productId)}</h1>
-                      ))}
-                    </TableCell>
-                    <TableCell>
-                      {order?.products.map((product: any) => (
-                        <img
-                          key={product.productId}
-                          src={getProductImage(product.productId)}
-                          alt="Product"
-                          className="w-12 h-12 object-cover rounded"
+                      {content?.videoMedia?.resource_type === "video" ? (
+                        <video
+                          src={content?.videoMedia.secure_url}
+                          style={{ width: "150px", height: "100px" }}
+                          controls
                         />
-                      ))}
+                      ) : (
+                        <img
+                          src={content?.videoMedia.secure_url}
+                          alt={content?.title}
+                          style={{ width: "150px", height: "100px" }}
+                        />
+                      )}
                     </TableCell>
-                    <TableCell>{order?.amount}</TableCell>
-                    <TableCell>{order?.status}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
-                          Edit
-                        </Button>
                         <Button color="red" size="sm" variant="outline">
                           Delete
                         </Button>
@@ -180,7 +153,7 @@ export default function Order() {
   );
 }
 
-function Package2Icon(props: any) {
+function Package2Icon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -201,7 +174,7 @@ function Package2Icon(props: any) {
   );
 }
 
-function SearchIcon(props: any) {
+function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
