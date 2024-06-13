@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import {
   TableHead,
@@ -13,13 +13,21 @@ import {
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { useEffect, useState } from "react";
-import { getData } from "../../global/server";
+import { useEffect } from "react";
+import { getData, postData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
+import CustomModal from "@/components/CustomModal";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [productImg, setProductImg] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState("");
+
   const dispatch = useDispatch();
   const user: any = useSelector((state: RootState) => state.auth.user);
   const auth = useSelector((state: RootState) => state.auth);
@@ -33,12 +41,44 @@ export default function Product() {
   const getProducts = async () => {
     try {
       const response = await getData("/api/supplement", auth.token);
-
       console.log("response ", response);
-
       setProducts(response);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setProductImg(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productImg) {
+      setError("Please select an image file.");
+      return;
+    }
+
+    setIsUploading(true); // Start uploading
+    setError(""); // Clear any previous error
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("file", productImg);
+
+    try {
+      await postData("/api/supplement", formData, auth.token, "media");
+
+      getProducts(); // Refresh the product list
+      setIsModalOpen(false); // Close the modal after successful submission
+    } catch (error) {
+      console.error("Error creating product", error);
+      setError("Error creating product. Please try again.");
+    } finally {
+      setIsUploading(false); // Stop uploading
     }
   };
 
@@ -46,9 +86,6 @@ export default function Product() {
   useEffect(() => {
     getProducts();
   }, [location]);
-
-  console.log(products);
-  console.log(products?.length);
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -99,6 +136,11 @@ export default function Product() {
               </CardContent>
             </Card>
           </div>
+          <div className="flex justify-end">
+            <Button className="w-40" onClick={() => setIsModalOpen(true)}>
+              Create New Product
+            </Button>
+          </div>
 
           <div className="border shadow-sm rounded-lg">
             <Table>
@@ -119,7 +161,7 @@ export default function Product() {
                     <TableCell>{product?.price}</TableCell>
                     <TableCell>
                       <img
-                        src={product?.productImg}
+                        src={product?.productImg.secure_url}
                         alt={product?.name}
                         style={{ width: "100px", height: "100px" }}
                       />
@@ -139,6 +181,57 @@ export default function Product() {
           </div>
         </main>
       </div>
+      {isModalOpen && (
+        <CustomModal
+          isOpen={isModalOpen}
+          toggleModal={() => setIsModalOpen(false)}
+        >
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Price
+              </label>
+              <Input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Product Image
+              </label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                required
+              />
+            </div>
+            {error && <p className="text-red-500">{error}</p>}
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                disabled={isUploading}
+                className={isUploading ? "bg-gray-400" : ""}
+              >
+                {isUploading ? "Uploading..." : "Create Product"}
+              </Button>
+            </div>
+          </form>
+        </CustomModal>
+      )}
     </div>
   );
 }

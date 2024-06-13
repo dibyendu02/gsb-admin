@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const BASE_URL = "https://gsb-backend.onrender.com";
-// export const BASE_URL = "http://192.168.0.11:5000";
+// export const BASE_URL = "http://192.168.0.8:5000";
 // export const BASE_URL = "http://192.168.231.101:5000";
 
 export const getData = async (url: string, token: string | null) => {

@@ -95,7 +95,11 @@ export default function ContentVideos() {
               </CardContent>
             </Card>
           </div>
-          <Button onClick={toggleModal}>Upload New Content Video</Button>
+          <div className="flex justify-end">
+            <Button className="w-60" onClick={toggleModal}>
+              Upload New Content Video
+            </Button>
+          </div>
           <UploadContentVideoModal
             isOpen={isModalOpen}
             toggleModal={toggleModal}
