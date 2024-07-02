@@ -13,15 +13,20 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
-import { getData } from "../../global/server";
+import { BASE_URL, getData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
+import axios from "axios";
 
 export default function Order() {
   const [orderData, setOrderData] = useState([]);
   const [products, setProducts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
   const user: any = useSelector((state: RootState) => state.auth.user);
   const auth = useSelector((state: RootState) => state.auth);
+  const token = useSelector((state: RootState) => state.auth.token);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,6 +53,46 @@ export default function Order() {
     }
   };
 
+  const deleteProduct = async (id: any) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/api/order/${id}`, {
+        headers: {
+          token: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      console.log("product deleted successfully");
+
+      // Update your state or re-fetch data if necessary
+      getOrderData();
+      getProducts();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const updateOrderStatus = async () => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/api/order/${selectedOrder._id}`,
+        { status: newStatus },
+        {
+          headers: {
+            token: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      console.log("Order updated successfully");
+
+      // Update state or re-fetch data if necessary
+      getOrderData();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     getOrderData();
     getProducts();
@@ -59,7 +104,7 @@ export default function Order() {
     );
     console.log(product);
     console.log(product?.productImg);
-    return product?.productImg;
+    return product?.productImg?.secure_url;
   };
 
   const getProductName = (productId: any) => {
@@ -161,10 +206,26 @@ export default function Order() {
                     <TableCell>{order?.status}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setNewStatus(order.status);
+                            setIsModalOpen(true);
+                          }}
+                        >
                           Edit
                         </Button>
-                        <Button color="red" size="sm" variant="outline">
+                        <Button
+                          onClick={() => {
+                            deleteProduct(order?._id);
+                          }}
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                        >
                           Delete
                         </Button>
                       </div>
@@ -176,6 +237,30 @@ export default function Order() {
           </div>
         </main>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Edit Order Status</h2>
+            <label className="block mb-2">Status</label>
+            <select
+              className="w-full p-2 border rounded"
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+            >
+              <option value="pending">Pending</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <div className="flex justify-end mt-4">
+              <Button onClick={() => setIsModalOpen(false)} className="mr-2">
+                Cancel
+              </Button>
+              <Button onClick={updateOrderStatus}>Save</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

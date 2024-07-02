@@ -12,6 +12,7 @@ import User from "./pages/User";
 import Order from "./pages/Order";
 import Chat from "./pages/Chat";
 import ContentVideos from "./pages/contentVideo";
+import DietPdf from "./pages/dietPdf";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
   {
     path: "/content-videos",
     element: <ContentVideos />,
+  },
+  {
+    path: "/diet-pdf",
+    element: <DietPdf />,
   },
   {
     path: "/user",

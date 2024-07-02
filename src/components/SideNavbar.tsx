@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import { FaCirclePlay } from "react-icons/fa6";
+import { FaFilePdf } from "react-icons/fa";
 
 const SideNavbar = () => {
   return (
@@ -52,6 +53,13 @@ const SideNavbar = () => {
           >
             <FaCirclePlay className="h-4 w-4" />
             Content Videos
+          </Link>
+          <Link
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+            to="/diet-pdf"
+          >
+            <FaFilePdf className="h-4 w-4" />
+            Diet Pdf
           </Link>
           <Link
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
