@@ -16,17 +16,12 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { storage } from "../../configuration";
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { BASE_URL, getData } from "../../global/server";
 
 export default function DietPdf() {
   const [contentPdfs, setContentPdfs] = useState([]);
-  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,7 +51,7 @@ export default function DietPdf() {
       return;
     }
 
-    const storageRef = ref(storage, `pdfs/${pdfFile.name}`);
+    const storageRef = ref(storage, `pdfs/${pdfFile?.name}`);
     const uploadTask = uploadBytesResumable(storageRef, pdfFile);
 
     uploadTask.on(

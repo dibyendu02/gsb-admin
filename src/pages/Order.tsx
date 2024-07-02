@@ -22,7 +22,7 @@ export default function Order() {
   const [orderData, setOrderData] = useState([]);
   const [products, setProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [newStatus, setNewStatus] = useState("");
   const user: any = useSelector((state: RootState) => state.auth.user);
   const auth = useSelector((state: RootState) => state.auth);
