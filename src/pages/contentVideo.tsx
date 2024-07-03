@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import UploadContentVideoModal from "@/components/UploadContentVideoModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getData } from "../../global/server";
+import { getData, deleteData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ export default function ContentVideos() {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -46,6 +47,24 @@ export default function ContentVideos() {
   useEffect(() => {
     getContentVideo();
   }, [location]);
+
+  // const handleEdit = (videoId: string) => {
+  //   setSelectedVideoId(videoId);
+  //   toggleModal();
+  // };
+
+  const handleDelete = async (videoId: string) => {
+    if (!window.confirm("Are you sure you want to delete this video?")) {
+      return;
+    }
+
+    try {
+      await deleteData(`/api/contentVideo/${videoId}`, auth.token);
+      getContentVideo(); // Refresh content video list
+    } catch (err) {
+      console.log("Error deleting video:", err);
+    }
+  };
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -103,6 +122,7 @@ export default function ContentVideos() {
           <UploadContentVideoModal
             isOpen={isModalOpen}
             toggleModal={toggleModal}
+            // videoId={selectedVideoId}
             onVideoUploaded={getContentVideo}
           />
           <div className="border shadow-sm rounded-lg">
@@ -141,7 +161,20 @@ export default function ContentVideos() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
+                        {/* <Button
+                          color="blue"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit(content._id)}
+                        >
+                          Edit
+                        </Button> */}
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(content._id)}
+                        >
                           Delete
                         </Button>
                       </div>

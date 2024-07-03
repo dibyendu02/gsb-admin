@@ -14,7 +14,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
-import { getData } from "../../global/server";
+import { getData, deleteData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
 
@@ -26,29 +26,35 @@ export default function Consultation() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  if (!user || !user?.isAdmin) {
+  if (!user || !user.isAdmin) {
     return <Navigate to="/" />;
   }
 
   const getConsultationData = async () => {
     try {
       const response = await getData("/api/consultation", auth.token);
-
-      console.log("response ", response);
-
       setConsultationData(response);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // get all products
+  const handleDelete = async (consultationId: string) => {
+    if (!window.confirm("Are you sure you want to delete this consultation?")) {
+      return;
+    }
+
+    try {
+      await deleteData(`/api/consultation/${consultationId}`, auth.token);
+      getConsultationData(); // Refresh the consultation data list
+    } catch (err) {
+      console.log("Error deleting consultation:", err);
+    }
+  };
+
   useEffect(() => {
     getConsultationData();
   }, [location]);
-
-  console.log(consultationData);
-  console.log(consultationData?.length);
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -97,10 +103,6 @@ export default function Consultation() {
                 <div className="text-2xl font-bold">
                   {consultationData?.length}
                 </div>
-                {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-                  +12 since last month
-
-                </p> */}
               </CardContent>
             </Card>
           </div>
@@ -109,30 +111,28 @@ export default function Consultation() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {/* <TableHead>ID</TableHead> */}
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
-
                   <TableHead>Message</TableHead>
-
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {consultationData?.map((consultation: any) => (
                   <TableRow key={consultation?._id}>
-                    {/* <TableCell>{consultation._id}</TableCell> */}
-
                     <TableCell>{`${consultation?.firstName} ${consultation?.lastName}`}</TableCell>
                     <TableCell>{consultation?.email}</TableCell>
                     <TableCell>{consultation?.phoneNumber}</TableCell>
-
                     <TableCell>{consultation?.message}</TableCell>
-
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(consultation._id)}
+                        >
                           Delete
                         </Button>
                       </div>

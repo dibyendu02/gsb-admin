@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import {
   TableHead,
@@ -14,17 +13,21 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
-import { getData } from "../../global/server";
+import { getData, putData, deleteData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
 
 export default function User() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [goal, setGoal] = useState("");
   const user: any = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
-
   const auth = useSelector((state: RootState) => state.auth);
-
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -35,27 +38,65 @@ export default function User() {
   const getUsers = async () => {
     try {
       const response = await getData("/api/user", auth.token);
-
-      console.log("response ", response);
-      // Filter out users where isAdmin is false
       const filteredUsers = response?.filter(
         (user: any) => user.isAdmin === false
       );
       setUsers(filteredUsers);
-
-      //   setUsers(response);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // get all products
   useEffect(() => {
     getUsers();
   }, [location]);
 
-  console.log(users);
-  console.log(users?.length);
+  const handleEditModalOpen = (user: any) => {
+    setCurrentUserId(user._id);
+    setName(user.name);
+    setEmail(user.email);
+    setPhoneNumber(user.phoneNumber);
+    setGoal(user.goal);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUserId) return;
+
+    const updatedUser = {
+      name,
+      email,
+      phoneNumber,
+      goal,
+    };
+
+    try {
+      await putData(
+        `/api/user/${currentUserId}`,
+        updatedUser,
+        auth.token,
+        null
+      );
+      getUsers(); // Refresh the user list
+      setIsModalOpen(false); // Close the modal
+    } catch (err) {
+      console.log("Error updating user:", err);
+    }
+  };
+
+  const handleDelete = async (userId: string) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) {
+      return;
+    }
+
+    try {
+      await deleteData(`/api/user/${userId}`, auth.token);
+      getUsers(); // Refresh the user list
+    } catch (err) {
+      console.log("Error deleting user:", err);
+    }
+  };
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -100,11 +141,6 @@ export default function User() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{users?.length}</div>
-                {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-
-                  +12 since last month
-
-                </p> */}
               </CardContent>
             </Card>
           </div>
@@ -113,29 +149,36 @@ export default function User() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {/* <TableHead>ID</TableHead> */}
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
-
                   <TableHead>Goal</TableHead>
-
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users?.map((user: any) => (
                   <TableRow key={user?._id}>
-                    {/* <TableCell>{consultation._id}</TableCell> */}
-
-                    <TableCell>{`${user?.name}`}</TableCell>
+                    <TableCell>{user?.name}</TableCell>
                     <TableCell>{user?.email}</TableCell>
                     <TableCell>{user?.phoneNumber}</TableCell>
                     <TableCell>{user?.goal}</TableCell>
-
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
+                        <Button
+                          color="blue"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditModalOpen(user)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(user._id)}
+                        >
                           Delete
                         </Button>
                       </div>
@@ -147,6 +190,68 @@ export default function User() {
           </div>
         </main>
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative">
+            <button
+              className="absolute top-2 right-2 text-2xl font-bold"
+              onClick={() => setIsModalOpen(false)}
+            >
+              &times;
+            </button>
+            <form onSubmit={handleEdit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Phone
+                </label>
+                <Input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Goal
+                </label>
+                <Input
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex items-center justify-end gap-4">
+                <Button type="button" onClick={() => setIsModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Save</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -165,9 +270,13 @@ function Package2Icon(props: any) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
-      <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
-      <path d="M12 3v6" />
+      <path d="M16.5 9.4 7.55 4.24" />
+      <path d="M21 16V8a2 2 0 0 0-1-1.73L13 2.27a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+      <path d="M3.29 7 12 12.67 20.71 7" />
+      <path d="M12 22.76V12.67" />
+      <path d="m7.5 4.21 9 5.19" />
+      <path d="M7.5 4.21v10.6L3 16" />
+      <path d="M21 16l-4.5-1.18V9.4" />
     </svg>
   );
 }

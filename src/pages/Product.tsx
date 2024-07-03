@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
@@ -13,20 +13,20 @@ import {
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { useEffect } from "react";
-import { getData, postData } from "../../global/server";
+import { getData, postData, putData, deleteData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
 import CustomModal from "@/components/CustomModal";
 
 export default function Product() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [productImg, setProductImg] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
+  const [editProductId, setEditProductId] = useState<string | null>(null);
 
   const dispatch = useDispatch();
   const user: any = useSelector((state: RootState) => state.auth.user);
@@ -74,6 +74,9 @@ export default function Product() {
 
       getProducts(); // Refresh the product list
       setIsModalOpen(false); // Close the modal after successful submission
+      setName("");
+      setPrice("");
+      setProductImg(null);
     } catch (error) {
       console.error("Error creating product", error);
       setError("Error creating product. Please try again.");
@@ -82,10 +85,77 @@ export default function Product() {
     }
   };
 
-  // get all products
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!editProductId) {
+      console.error("Edit product ID is not set.");
+      return;
+    }
+
+    setIsUploading(true); // Start editing
+    setError(""); // Clear any previous error
+
+    if (!productImg) {
+      setError("Please select an image file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("file", productImg);
+
+    try {
+      await putData(
+        `/api/supplement/${editProductId}`,
+        formData,
+        auth.token,
+        "media"
+      );
+
+      getProducts(); // Refresh the product list
+      setIsModalOpen(false); // Close the modal after successful submission
+      setName("");
+      setPrice("");
+      setProductImg(null);
+      setEditProductId(null);
+    } catch (error) {
+      console.error("Error editing product", error);
+      setError("Error editing product. Please try again.");
+    } finally {
+      setIsUploading(false); // Stop editing
+    }
+  };
+
+  const handleDelete = async (productId: string) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
+
+    try {
+      await deleteData(`/api/supplement/${productId}`, auth.token);
+
+      getProducts(); // Refresh the product list after deletion
+    } catch (error) {
+      console.error("Error deleting product", error);
+      setError("Error deleting product. Please try again.");
+    }
+  };
+
   useEffect(() => {
     getProducts();
   }, [location]);
+
+  const handleEditModalOpen = (product: any) => {
+    console.log("editProductId is " + editProductId);
+    console.log(product._id);
+    setEditProductId(product._id);
+    setName(product.name);
+    setPrice(product.price);
+    setProductImg(product.productImg.secure_url);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -130,9 +200,6 @@ export default function Product() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{products?.length}</div>
-                {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-                  +12 since last month
-                </p> */}
               </CardContent>
             </Card>
           </div>
@@ -169,7 +236,20 @@ export default function Product() {
 
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
+                        <Button
+                          color="blue"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditModalOpen(product)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(product._id)}
+                        >
                           Delete
                         </Button>
                       </div>
@@ -186,7 +266,7 @@ export default function Product() {
           isOpen={isModalOpen}
           toggleModal={() => setIsModalOpen(false)}
         >
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={editProductId ? handleEdit : handleSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">
                 Name
@@ -216,7 +296,7 @@ export default function Product() {
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                required
+                required={!editProductId} // Only required for new product creation
               />
             </div>
             {error && <p className="text-red-500">{error}</p>}
@@ -226,7 +306,11 @@ export default function Product() {
                 disabled={isUploading}
                 className={isUploading ? "bg-gray-400" : ""}
               >
-                {isUploading ? "Uploading..." : "Create Product"}
+                {isUploading
+                  ? "Uploading..."
+                  : editProductId
+                  ? "Update Product"
+                  : "Create Product"}
               </Button>
             </div>
           </form>

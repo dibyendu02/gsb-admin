@@ -54,6 +54,9 @@ export default function Order() {
   };
 
   const deleteProduct = async (id: any) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
     try {
       const response = await axios.delete(`${BASE_URL}/api/order/${id}`, {
         headers: {

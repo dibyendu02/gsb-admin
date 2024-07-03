@@ -14,7 +14,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useEffect, useState } from "react";
-import { getData } from "../../global/server";
+import { getData, deleteData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 
 import SideNavbar from "@/components/SideNavbar";
@@ -34,22 +34,28 @@ export default function Stories() {
   const getStories = async () => {
     try {
       const response = await getData("/api/story", auth.token);
-
-      console.log("response ", response);
-
       setStories(response);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // get all products
+  const handleDelete = async (storyId: string) => {
+    if (!window.confirm("Are you sure you want to delete this story?")) {
+      return;
+    }
+
+    try {
+      await deleteData(`/api/story/${storyId}`, auth.token);
+      getStories(); // Refresh the stories list
+    } catch (err) {
+      console.log("Error deleting story:", err);
+    }
+  };
+
   useEffect(() => {
     getStories();
   }, [location]);
-
-  console.log(stories);
-  console.log(stories?.length);
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -96,11 +102,6 @@ export default function Stories() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stories?.length}</div>
-                {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-
-                  +12 since last month
-
-                </p> */}
               </CardContent>
             </Card>
           </div>
@@ -112,9 +113,7 @@ export default function Stories() {
                   <TableHead>ID</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Description</TableHead>
-
                   <TableHead>Image</TableHead>
-
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -122,7 +121,6 @@ export default function Stories() {
                 {stories?.map((story: any) => (
                   <TableRow key={story?._id}>
                     <TableCell>{story?._id}</TableCell>
-
                     <TableCell>{story?.title}</TableCell>
                     <TableCell>{story?.description}</TableCell>
                     <TableCell>
@@ -134,7 +132,12 @@ export default function Stories() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button color="red" size="sm" variant="outline">
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(story._id)}
+                        >
                           Delete
                         </Button>
                       </div>
