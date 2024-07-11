@@ -13,6 +13,8 @@ import Order from "./pages/Order";
 import Chat from "./pages/Chat";
 import ContentVideos from "./pages/contentVideo";
 import DietPdf from "./pages/dietPdf";
+import UserUpdates from "./pages/UserUpdates";
+import SingleUserUpdates from "./pages/SinglUserUpdates";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +40,14 @@ const router = createBrowserRouter([
   {
     path: "/stories",
     element: <Stories />,
+  },
+  {
+    path: "/userUpdates",
+    element: <UserUpdates />,
+  },
+  {
+    path: "/userUpdates/:id",
+    element: <SingleUserUpdates />,
   },
   {
     path: "/content-videos",

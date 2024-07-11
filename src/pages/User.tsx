@@ -25,6 +25,7 @@ export default function User() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [goal, setGoal] = useState("");
+  const [zone, setZone] = useState(""); // State for selected zone
   const user: any = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
@@ -57,6 +58,7 @@ export default function User() {
     setEmail(user.email);
     setPhoneNumber(user.phoneNumber);
     setGoal(user.goal);
+    setZone(user.zone); // Set zone from user data
     setIsModalOpen(true);
   };
 
@@ -69,6 +71,7 @@ export default function User() {
       email,
       phoneNumber,
       goal,
+      zone,
     };
 
     try {
@@ -146,6 +149,23 @@ export default function User() {
           </div>
 
           <div className="border shadow-sm rounded-lg">
+            <div className="p-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Filter by Goal:
+              </label>
+              <select
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                className="mt-2 p-2 border rounded"
+              >
+                <option value="">All</option>
+                <option value="Diabetes">Diabetes</option>
+                <option value="IBS Colitis & Crohn's">
+                  IBS Colitis & Crohn's
+                </option>
+                <option value="Mental Depression">Mental Depression</option>
+              </select>
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -153,6 +173,8 @@ export default function User() {
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Goal</TableHead>
+                  <TableHead>Zone</TableHead> {/* Added Zone column header */}
+                  <TableHead>Daily Update</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -163,6 +185,19 @@ export default function User() {
                     <TableCell>{user?.email}</TableCell>
                     <TableCell>{user?.phoneNumber}</TableCell>
                     <TableCell>{user?.goal}</TableCell>
+                    <TableCell>{user?.zone}</TableCell> {/* Display zone */}
+                    <TableCell>
+                      <Button
+                        color="blue"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          navigate(`/userUpdates/${user._id}`);
+                        }}
+                      >
+                        View
+                      </Button>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button
@@ -236,11 +271,35 @@ export default function User() {
                 <label className="block text-sm font-medium text-gray-700">
                   Goal
                 </label>
-                <Input
+                <select
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
+                  className="w-full p-2 border rounded"
                   required
-                />
+                >
+                  <option value="">Select a goal</option>
+                  <option value="Diabetes">Diabetes</option>
+                  <option value="IBS Colitis & Crohn's">
+                    IBS Colitis & Crohn's
+                  </option>
+                  <option value="Mental Depression">Mental Depression</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Zone
+                </label>
+                <select
+                  value={zone}
+                  onChange={(e) => setZone(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  required
+                >
+                  <option value="">Select a zone</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Yellow">Yellow</option>
+                  <option value="Red">Red</option>
+                </select>
               </div>
               <div className="flex items-center justify-end gap-4">
                 <Button type="button" onClick={() => setIsModalOpen(false)}>

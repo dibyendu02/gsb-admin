@@ -129,9 +129,9 @@ export default function ContentVideos() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead style={{ width: "150px" }}>ID</TableHead>
+                  <TableHead style={{ width: "150px" }}>Title</TableHead>
+                  <TableHead style={{ width: "300px" }}>Description</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Video</TableHead>
                   <TableHead>Actions</TableHead>
