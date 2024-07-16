@@ -23,7 +23,8 @@ export default function Product() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [productImg, setProductImg] = useState<File | null>(null);
+  const [description, setDescription] = useState("");
+  const [productImgs, setProductImgs] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const [editProductId, setEditProductId] = useState<string | null>(null);
@@ -50,14 +51,14 @@ export default function Product() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setProductImg(e.target.files[0]);
+      setProductImgs(Array.from(e.target.files));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productImg) {
-      setError("Please select an image file.");
+    if (productImgs.length === 0) {
+      setError("Please select image files.");
       return;
     }
 
@@ -67,7 +68,8 @@ export default function Product() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
-    formData.append("file", productImg);
+    formData.append("description", description);
+    productImgs.forEach((img) => formData.append("files", img));
 
     try {
       await postData("/api/supplement", formData, auth.token, "media");
@@ -76,7 +78,8 @@ export default function Product() {
       setIsModalOpen(false); // Close the modal after successful submission
       setName("");
       setPrice("");
-      setProductImg(null);
+      setDescription("");
+      setProductImgs([]);
     } catch (error) {
       console.error("Error creating product", error);
       setError("Error creating product. Please try again.");
@@ -96,15 +99,13 @@ export default function Product() {
     setIsUploading(true); // Start editing
     setError(""); // Clear any previous error
 
-    if (!productImg) {
-      setError("Please select an image file.");
-      return;
-    }
-
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
-    formData.append("file", productImg);
+    formData.append("description", description);
+    if (productImgs.length > 0) {
+      productImgs.forEach((img) => formData.append("files", img));
+    }
 
     try {
       await putData(
@@ -118,7 +119,8 @@ export default function Product() {
       setIsModalOpen(false); // Close the modal after successful submission
       setName("");
       setPrice("");
-      setProductImg(null);
+      setDescription("");
+      setProductImgs([]);
       setEditProductId(null);
     } catch (error) {
       console.error("Error editing product", error);
@@ -148,12 +150,11 @@ export default function Product() {
   }, [location]);
 
   const handleEditModalOpen = (product: any) => {
-    console.log("editProductId is " + editProductId);
-    console.log(product._id);
     setEditProductId(product._id);
     setName(product.name);
     setPrice(product.price);
-    setProductImg(product.productImg.secure_url);
+    setDescription(product.description);
+    setProductImgs(product.productImgs);
     setIsModalOpen(true);
   };
 
@@ -216,7 +217,8 @@ export default function Product() {
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead>Product Image</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Product Images</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -226,14 +228,17 @@ export default function Product() {
                     <TableCell>{product?._id}</TableCell>
                     <TableCell>{product?.name}</TableCell>
                     <TableCell>{product?.price}</TableCell>
+                    <TableCell>{product?.description}</TableCell>
                     <TableCell>
-                      <img
-                        src={product?.productImg.secure_url}
-                        alt={product?.name}
-                        style={{ width: "100px", height: "100px" }}
-                      />
+                      {product?.productImgs.map((img: any, index: number) => (
+                        <img
+                          key={index}
+                          src={img.secure_url}
+                          alt={product?.name}
+                          style={{ width: "100px", height: "100px" }}
+                        />
+                      ))}
                     </TableCell>
-
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button
@@ -290,11 +295,22 @@ export default function Product() {
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">
-                Product Image
+                Description
+              </label>
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Product Images
               </label>
               <Input
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleFileChange}
                 required={!editProductId} // Only required for new product creation
               />
