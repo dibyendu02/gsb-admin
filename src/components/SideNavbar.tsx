@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { IoChatbubbleOutline } from "react-icons/io5";
@@ -5,8 +6,18 @@ import { FaCirclePlay } from "react-icons/fa6";
 import { FaFilePdf } from "react-icons/fa";
 
 const SideNavbar = () => {
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleMouseEnter = () => {
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowDropdown(false);
+  };
+
   return (
-    <div className="flex h-full max-h-screen flex-col gap-2">
+    <div className="flex h-full max-h-screen flex-col gap-2 relative">
       <div className="flex h-[60px] items-center border-b px-6">
         <Link className="flex items-center gap-2 font-semibold" to="#">
           <Package2Icon className="h-6 w-6" />
@@ -18,7 +29,8 @@ const SideNavbar = () => {
         </Button>
       </div>
       <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start px-4 text-sm font-medium">
+        <nav className="grid relative items-start px-4 text-sm font-medium">
+          {/* Other links */}
           <Link
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
             to="/product"
@@ -47,20 +59,33 @@ const SideNavbar = () => {
             <FileIcon className="h-4 w-4" />
             User Stories
           </Link>
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to="/content-videos"
+          <div
+            className="relative"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
-            <FaCirclePlay className="h-4 w-4" />
-            Content Videos
-          </Link>
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to="/yt-content-videos"
-          >
-            <FaCirclePlay className="h-4 w-4" />
-            YT Content Videos
-          </Link>
+            <button className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
+              <FaCirclePlay className="h-4 w-4" />
+              Content Videos
+            </button>
+            {showDropdown && (
+              <div className="absolute top-0 right-0 mt-10 bg-white shadow-lg rounded-lg w-40 py-2 z-10">
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/content-videos"
+                >
+                  Content Videos
+                </Link>
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/yt-content-videos"
+                >
+                  YT Content Videos
+                </Link>
+              </div>
+            )}
+          </div>
+          {/* Remaining links */}
           <Link
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
             to="/diet-pdf"
@@ -94,6 +119,8 @@ const SideNavbar = () => {
     </div>
   );
 };
+
+// Icons and other functions
 
 function BellIcon(props: any) {
   return (

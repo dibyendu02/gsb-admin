@@ -20,6 +20,9 @@ import UploadYTContentVideoModal from "@/components/UploadYTContentVideo";
 
 export default function YTContentVideos() {
   const [ytContentVideos, setYTContentVideos] = useState([]);
+  const [filteredVideos, setFilteredVideos] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+
   const user: any = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
@@ -38,6 +41,7 @@ export default function YTContentVideos() {
     try {
       const response = await getData("/api/ytContentVideo", auth.token);
       setYTContentVideos(response);
+      setFilteredVideos(response);
     } catch (err) {
       console.log(err);
     }
@@ -57,6 +61,22 @@ export default function YTContentVideos() {
       getYTContentVideos(); // Refresh content video list
     } catch (err) {
       console.log("Error deleting video:", err);
+    }
+  };
+
+  const handleCategoryFilterChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedCategory = e.target.value;
+    setCategoryFilter(selectedCategory);
+
+    if (selectedCategory === "") {
+      setFilteredVideos(ytContentVideos); // Reset to all videos
+    } else {
+      const filtered = ytContentVideos.filter(
+        (video: any) => video.category === selectedCategory
+      );
+      setFilteredVideos(filtered);
     }
   };
 
@@ -119,6 +139,21 @@ export default function YTContentVideos() {
             onVideoUploaded={getYTContentVideos}
           />
           <div className="border shadow-sm rounded-lg">
+            <div className="p-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Filter by Category:
+              </label>
+              <select
+                value={categoryFilter}
+                onChange={handleCategoryFilterChange}
+                className="mt-2 p-2 border rounded"
+              >
+                <option value="">All Categories</option>
+                <option value="meditation">Meditation</option>
+                <option value="education">Education</option>
+                <option value="consultancy">Consultancy</option>
+              </select>
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -131,7 +166,7 @@ export default function YTContentVideos() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {ytContentVideos?.map((content: any) => (
+                {filteredVideos?.map((content: any) => (
                   <TableRow key={content?._id}>
                     <TableCell>{content?._id}</TableCell>
                     <TableCell>{content?.title}</TableCell>

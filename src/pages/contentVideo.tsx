@@ -20,6 +20,9 @@ import { Input } from "@/components/ui/input";
 
 export default function ContentVideos() {
   const [contentVideos, setContentVideos] = useState([]);
+  const [filteredVideos, setFilteredVideos] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+
   const user: any = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const auth = useSelector((state: RootState) => state.auth);
@@ -27,7 +30,6 @@ export default function ContentVideos() {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -39,6 +41,7 @@ export default function ContentVideos() {
     try {
       const response = await getData("/api/contentVideo", auth.token);
       setContentVideos(response);
+      setFilteredVideos(response); // Initialize filteredVideos with all content videos
     } catch (err) {
       console.log(err);
     }
@@ -47,11 +50,6 @@ export default function ContentVideos() {
   useEffect(() => {
     getContentVideo();
   }, [location]);
-
-  // const handleEdit = (videoId: string) => {
-  //   setSelectedVideoId(videoId);
-  //   toggleModal();
-  // };
 
   const handleDelete = async (videoId: string) => {
     if (!window.confirm("Are you sure you want to delete this video?")) {
@@ -63,6 +61,22 @@ export default function ContentVideos() {
       getContentVideo(); // Refresh content video list
     } catch (err) {
       console.log("Error deleting video:", err);
+    }
+  };
+
+  const handleCategoryFilterChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedCategory = e.target.value;
+    setCategoryFilter(selectedCategory);
+
+    if (selectedCategory === "") {
+      setFilteredVideos(contentVideos); // Reset to all videos
+    } else {
+      const filtered = contentVideos.filter(
+        (video: any) => video.category === selectedCategory
+      );
+      setFilteredVideos(filtered);
     }
   };
 
@@ -109,7 +123,7 @@ export default function ContentVideos() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {contentVideos?.length}
+                  {filteredVideos?.length}
                 </div>
               </CardContent>
             </Card>
@@ -122,10 +136,25 @@ export default function ContentVideos() {
           <UploadContentVideoModal
             isOpen={isModalOpen}
             toggleModal={toggleModal}
-            // videoId={selectedVideoId}
             onVideoUploaded={getContentVideo}
           />
           <div className="border shadow-sm rounded-lg">
+            <div className="p-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Filter by Category:
+              </label>
+              <select
+                value={categoryFilter}
+                onChange={handleCategoryFilterChange}
+                className="mt-2 p-2 border rounded"
+              >
+                <option value="">All Categories</option>
+                <option value="meditation">Meditation</option>
+                <option value="education">Education</option>
+                <option value="consultancy">Consultancy</option>
+              </select>
+            </div>
+
             <Table>
               <TableHeader>
                 <TableRow>
@@ -138,7 +167,7 @@ export default function ContentVideos() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contentVideos?.map((content: any) => (
+                {filteredVideos?.map((content: any) => (
                   <TableRow key={content?._id}>
                     <TableCell>{content?._id}</TableCell>
                     <TableCell>{content?.title}</TableCell>
@@ -161,14 +190,6 @@ export default function ContentVideos() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {/* <Button
-                          color="blue"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(content._id)}
-                        >
-                          Edit
-                        </Button> */}
                         <Button
                           color="red"
                           size="sm"
