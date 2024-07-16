@@ -15,6 +15,7 @@ import ContentVideos from "./pages/contentVideo";
 import DietPdf from "./pages/dietPdf";
 import UserUpdates from "./pages/UserUpdates";
 import SingleUserUpdates from "./pages/SinglUserUpdates";
+import YTContentVideos from "./pages/YTcontentVideo";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
   {
     path: "/content-videos",
     element: <ContentVideos />,
+  },
+  {
+    path: "/yt-content-videos",
+    element: <YTContentVideos />,
   },
   {
     path: "/diet-pdf",
