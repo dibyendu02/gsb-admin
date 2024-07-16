@@ -81,6 +81,7 @@ export default function Login() {
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="1234567890"
               required
+              autoComplete="true"
               type="tel"
             />
           </div>

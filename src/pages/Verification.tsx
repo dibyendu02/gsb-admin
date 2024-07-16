@@ -110,6 +110,7 @@ export default function Verification() {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               placeholder="123456"
+              autoComplete="true"
             />
           </div>
 
