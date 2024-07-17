@@ -31,6 +31,10 @@ export default function DietPdf() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const redirect = (url: string) => {
+    window.open(url, "_blank");
+  };
+
   if (!user?.isAdmin || !user) {
     return <Navigate to="/" />;
   }
@@ -170,11 +174,21 @@ export default function DietPdf() {
               <TableBody>
                 {contentPdfs?.map((content: any) => (
                   <TableRow key={content?._id}>
-                    <TableCell>{content?._id}</TableCell>
-                    <TableCell>{content?.title}</TableCell>
-                    <TableCell>{content?.description}</TableCell>
+                    <TableCell className="w-[15%]">{content?._id}</TableCell>
+                    <TableCell className="w-[30%]">{content?.title}</TableCell>
+                    <TableCell className="w-[30%]">
+                      {content?.description}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
+                        <Button
+                          color="red"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => redirect(content?.url)}
+                        >
+                          View
+                        </Button>
                         <Button
                           color="red"
                           size="sm"

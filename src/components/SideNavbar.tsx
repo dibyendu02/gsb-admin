@@ -1,20 +1,47 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, MutableRefObject } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { IoChatbubbleOutline } from "react-icons/io5";
-import { FaCirclePlay } from "react-icons/fa6";
 import { FaFilePdf } from "react-icons/fa";
+import { FaCirclePlay } from "react-icons/fa6";
 
 const SideNavbar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showVideosDropdown, setShowVideosDropdown] = useState(false);
+  const [showUsersDropdown, setShowUsersDropdown] = useState(false);
+  const [showDietDropdown, setShowDietDropdown] = useState(false);
 
-  const handleMouseEnter = () => {
-    setShowDropdown(true);
-  };
+  const videosDropdownRef: MutableRefObject<HTMLDivElement | null> =
+    useRef(null);
+  const usersDropdownRef: MutableRefObject<HTMLDivElement | null> =
+    useRef(null);
+  const dietDropdownRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
-  const handleMouseLeave = () => {
-    setShowDropdown(false);
-  };
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (
+        videosDropdownRef.current &&
+        !videosDropdownRef.current.contains(event.target)
+      ) {
+        setShowVideosDropdown(false);
+      }
+      if (
+        usersDropdownRef.current &&
+        !usersDropdownRef.current.contains(event.target)
+      ) {
+        setShowUsersDropdown(false);
+      }
+      if (
+        dietDropdownRef.current &&
+        !dietDropdownRef.current.contains(event.target)
+      ) {
+        setShowDietDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="flex h-full max-h-screen flex-col gap-2 relative">
@@ -38,13 +65,37 @@ const SideNavbar = () => {
             <PackageIcon className="h-4 w-4" />
             Products
           </Link>
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to="/user"
-          >
-            <UsersIcon className="h-4 w-4" />
-            Users
-          </Link>
+          <div className="relative" ref={usersDropdownRef}>
+            <button
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              onClick={() => setShowUsersDropdown(!showUsersDropdown)}
+            >
+              <UsersIcon className="h-4 w-4" />
+              Users
+            </button>
+            {showUsersDropdown && (
+              <div className="absolute top-0 left-0 mt-10 bg-white shadow-lg rounded-lg w-40 py-2 z-10">
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/userUpdates"
+                >
+                  User Updates
+                </Link>
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/user"
+                >
+                  User Details
+                </Link>
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/userStories"
+                >
+                  User Stories
+                </Link>
+              </div>
+            )}
+          </div>
           <Link
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
             to="/order"
@@ -52,23 +103,15 @@ const SideNavbar = () => {
             <ShoppingCartIcon className="h-4 w-4" />
             Orders
           </Link>
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to="/stories"
-          >
-            <FileIcon className="h-4 w-4" />
-            User Stories
-          </Link>
-          <div
-            className="relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
+          <div className="relative" ref={videosDropdownRef}>
+            <button
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              onClick={() => setShowVideosDropdown(!showVideosDropdown)}
+            >
               <FaCirclePlay className="h-4 w-4" />
               Content Videos
             </button>
-            {showDropdown && (
+            {showVideosDropdown && (
               <div className="absolute top-0 right-0 mt-10 bg-white shadow-lg rounded-lg w-40 py-2 z-10">
                 <Link
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -85,27 +128,45 @@ const SideNavbar = () => {
               </div>
             )}
           </div>
+          <div className="relative" ref={dietDropdownRef}>
+            <button
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              onClick={() => setShowDietDropdown(!showDietDropdown)}
+            >
+              <FaFilePdf className="h-4 w-4" />
+              Diet Pdf
+            </button>
+            {showDietDropdown && (
+              <div className="absolute top-0 left-0 mt-10 bg-white shadow-lg rounded-lg w-40 py-2 z-10">
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/general-diet"
+                >
+                  General Diet
+                </Link>
+                <Link
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  to="/subscriber-diet"
+                >
+                  Subscriber Diet
+                </Link>
+              </div>
+            )}
+          </div>
           {/* Remaining links */}
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to="/diet-pdf"
-          >
-            <FaFilePdf className="h-4 w-4" />
-            Diet Pdf
-          </Link>
-          <Link
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            to="/userUpdates"
-          >
-            <FileIcon className="h-4 w-4" />
-            User Updates
-          </Link>
           <Link
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
             to="/consultation"
           >
             <MailIcon className="h-4 w-4" />
             Consultation
+          </Link>
+          <Link
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+            to="/service-questions"
+          >
+            <FaFilePdf className="h-4 w-4" />
+            Service Questions
           </Link>
           <Link
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
@@ -138,26 +199,6 @@ function BellIcon(props: any) {
     >
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-    </svg>
-  );
-}
-
-function FileIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
     </svg>
   );
 }

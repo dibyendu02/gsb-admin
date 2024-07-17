@@ -103,6 +103,8 @@ export default function YTContentVideos() {
           </div>
           <Button
             onClick={() => {
+              localStorage.removeItem("userId");
+              localStorage.removeItem("authToken");
               dispatch(logout());
               navigate("/");
             }}

@@ -194,8 +194,10 @@ export default function UserUpdates() {
                       {format(new Date(update?.createdAt), "PPpp")}
                     </TableCell>
                     <TableCell>{userNames[update.userId]}</TableCell>
-                    <TableCell>{update?.title}</TableCell>
-                    <TableCell>{update?.description}</TableCell>
+                    <TableCell className="w-[20%]">{update?.title}</TableCell>
+                    <TableCell className="w-[20%]">
+                      {update?.description}
+                    </TableCell>
                     <TableCell
                       onClick={() => {
                         setModalImage(update?.updateImg.secure_url);

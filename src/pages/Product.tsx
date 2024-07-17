@@ -214,7 +214,6 @@ export default function Product() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Description</TableHead>
@@ -225,10 +224,11 @@ export default function Product() {
               <TableBody>
                 {products?.map((product: any) => (
                   <TableRow key={product?._id}>
-                    <TableCell>{product?._id}</TableCell>
-                    <TableCell>{product?.name}</TableCell>
+                    <TableCell className="w-[20%]">{product?.name}</TableCell>
                     <TableCell>{product?.price}</TableCell>
-                    <TableCell>{product?.description}</TableCell>
+                    <TableCell className="w-[25%]">
+                      {product?.description}
+                    </TableCell>
                     <TableCell>
                       {product?.productImgs.map((img: any, index: number) => (
                         <img

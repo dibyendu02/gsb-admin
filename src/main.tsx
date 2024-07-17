@@ -16,6 +16,8 @@ import DietPdf from "./pages/dietPdf";
 import UserUpdates from "./pages/UserUpdates";
 import SingleUserUpdates from "./pages/SinglUserUpdates";
 import YTContentVideos from "./pages/YTcontentVideo";
+import SubscriberDiet from "./pages/SubscriberDiet";
+import ServiceQuestions from "./pages/ServiceQuestions";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +41,7 @@ const router = createBrowserRouter([
     element: <Consultation />,
   },
   {
-    path: "/stories",
+    path: "/userStories",
     element: <Stories />,
   },
   {
@@ -59,8 +61,12 @@ const router = createBrowserRouter([
     element: <YTContentVideos />,
   },
   {
-    path: "/diet-pdf",
+    path: "/general-diet",
     element: <DietPdf />,
+  },
+  {
+    path: "/subscriber-diet",
+    element: <SubscriberDiet />,
   },
   {
     path: "/user",
@@ -73,6 +79,10 @@ const router = createBrowserRouter([
   {
     path: "/chat",
     element: <Chat />,
+  },
+  {
+    path: "/service-questions",
+    element: <ServiceQuestions />,
   },
 ]);
 

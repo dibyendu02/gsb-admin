@@ -121,8 +121,10 @@ export default function Stories() {
                 {stories?.map((story: any) => (
                   <TableRow key={story?._id}>
                     <TableCell>{story?._id}</TableCell>
-                    <TableCell>{story?.title}</TableCell>
-                    <TableCell>{story?.description}</TableCell>
+                    <TableCell className="w-[20%]">{story?.title}</TableCell>
+                    <TableCell className="w-[20%]">
+                      {story?.description}
+                    </TableCell>
                     <TableCell>
                       <img
                         src={story?.storyImg.secure_url}

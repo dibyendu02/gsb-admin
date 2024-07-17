@@ -17,7 +17,7 @@ import { getData, putData, deleteData } from "../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
 
-export default function User() {
+export default function SubscriberDiet() {
   const [users, setUsers] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -44,8 +44,11 @@ export default function User() {
       const filteredUsers = response?.filter(
         (user: any) => user.isAdmin === false
       );
-      setUsers(filteredUsers);
-      setFilteredUsers(filteredUsers);
+      const subscribedUsers = filteredUsers?.filter(
+        (user: any) => user.subscriptionStatus === true
+      );
+      setUsers(subscribedUsers);
+      setFilteredUsers(subscribedUsers);
     } catch (err) {
       console.log(err);
     }
@@ -116,6 +119,11 @@ export default function User() {
     }
   };
 
+  const redirectToWhatsApp = (phoneNumber: { phoneNumber: string }) => {
+    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+    window.location.href = whatsappUrl;
+  };
+
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
@@ -152,7 +160,9 @@ export default function User() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Users</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Subscribed Users
+                </CardTitle>
                 <Link className="text-sm font-medium underline" to="#">
                   View All
                 </Link>
@@ -185,10 +195,10 @@ export default function User() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Goal</TableHead>
                   <TableHead>Zone</TableHead> {/* Added Zone column header */}
+                  <TableHead>Send Diet</TableHead>
                   <TableHead>Daily Update</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -197,10 +207,19 @@ export default function User() {
                 {filteredUsers?.map((user: any) => (
                   <TableRow key={user?._id}>
                     <TableCell>{user?.name}</TableCell>
-                    <TableCell>{user?.email}</TableCell>
                     <TableCell>{user?.phoneNumber}</TableCell>
                     <TableCell>{user?.goal}</TableCell>
                     <TableCell>{user?.zone}</TableCell> {/* Display zone */}
+                    <TableCell>
+                      <Button
+                        color="blue"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => redirectToWhatsApp(user.phoneNumber)}
+                      >
+                        Via Whatsapp
+                      </Button>
+                    </TableCell>
                     <TableCell>
                       <Button
                         color="blue"

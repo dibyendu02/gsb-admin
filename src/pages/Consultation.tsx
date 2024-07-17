@@ -124,7 +124,9 @@ export default function Consultation() {
                     <TableCell>{`${consultation?.firstName} ${consultation?.lastName}`}</TableCell>
                     <TableCell>{consultation?.email}</TableCell>
                     <TableCell>{consultation?.phoneNumber}</TableCell>
-                    <TableCell>{consultation?.message}</TableCell>
+                    <TableCell className="w-[20%]">
+                      {consultation?.message}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button
