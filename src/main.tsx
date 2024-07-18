@@ -11,13 +11,16 @@ import Stories from "./pages/Stories";
 import User from "./pages/User";
 import Order from "./pages/Order";
 import Chat from "./pages/Chat";
-import ContentVideos from "./pages/contentVideo";
+import ContentVideos from "./pages/videos/contentVideo";
 import DietPdf from "./pages/dietPdf";
 import UserUpdates from "./pages/UserUpdates";
 import SingleUserUpdates from "./pages/SinglUserUpdates";
-import YTContentVideos from "./pages/YTcontentVideo";
+import YTContentVideos from "./pages/videos/YTcontentVideo";
 import SubscriberDiet from "./pages/SubscriberDiet";
-import ServiceQuestions from "./pages/ServiceQuestions";
+import IBSquestions from "./pages/questions/IBSquestions";
+import DiabetesQuestions from "./pages/questions/DiabetesQuestions";
+import DepressionQuestions from "./pages/questions/DepressionQuestions";
+import SubscriberVideos from "./pages/videos/subscriberVideo";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +64,10 @@ const router = createBrowserRouter([
     element: <YTContentVideos />,
   },
   {
+    path: "/subscriber-videos",
+    element: <SubscriberVideos />,
+  },
+  {
     path: "/general-diet",
     element: <DietPdf />,
   },
@@ -81,8 +88,16 @@ const router = createBrowserRouter([
     element: <Chat />,
   },
   {
-    path: "/service-questions",
-    element: <ServiceQuestions />,
+    path: "/IBS-questions",
+    element: <IBSquestions />,
+  },
+  {
+    path: "/depression-questions",
+    element: <DepressionQuestions />,
+  },
+  {
+    path: "/diabetes-questions",
+    element: <DiabetesQuestions />,
   },
 ]);
 

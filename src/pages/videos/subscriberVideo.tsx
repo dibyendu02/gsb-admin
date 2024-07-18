@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import UploadContentVideoModal from "@/components/UploadContentVideoModal";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getData, deleteData } from "../../global/server";
+import { getData, deleteData } from "../../../global/server";
 import { logout } from "@/redux/authSlice";
 import SideNavbar from "@/components/SideNavbar";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -17,9 +16,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import UploadSubscriberVideoModal from "@/components/UploadSubscriberVideoModal";
 
-export default function ContentVideos() {
-  const [contentVideos, setContentVideos] = useState([]);
+export default function SubscriberVideos() {
+  const [subscriberVideos, setSubscriberVideos] = useState([]);
   const [filteredVideos, setFilteredVideos] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
 
@@ -37,10 +37,10 @@ export default function ContentVideos() {
     return <Navigate to="/" />;
   }
 
-  const getContentVideo = async () => {
+  const getSubscriberVideo = async () => {
     try {
-      const response = await getData("/api/contentVideo", auth.token);
-      setContentVideos(response);
+      const response = await getData("/api/subscriberVideo", auth.token);
+      setSubscriberVideos(response);
       setFilteredVideos(response); // Initialize filteredVideos with all content videos
     } catch (err) {
       console.log(err);
@@ -48,7 +48,7 @@ export default function ContentVideos() {
   };
 
   useEffect(() => {
-    getContentVideo();
+    getSubscriberVideo();
   }, [location]);
 
   const handleDelete = async (videoId: string) => {
@@ -57,8 +57,8 @@ export default function ContentVideos() {
     }
 
     try {
-      await deleteData(`/api/contentVideo/${videoId}`, auth.token);
-      getContentVideo(); // Refresh content video list
+      await deleteData(`/api/subscriberVideo/${videoId}`, auth.token);
+      getSubscriberVideo(); // Refresh content video list
     } catch (err) {
       console.log("Error deleting video:", err);
     }
@@ -71,9 +71,9 @@ export default function ContentVideos() {
     setCategoryFilter(selectedCategory);
 
     if (selectedCategory === "") {
-      setFilteredVideos(contentVideos); // Reset to all videos
+      setFilteredVideos(subscriberVideos); // Reset to all videos
     } else {
-      const filtered = contentVideos.filter(
+      const filtered = subscriberVideos.filter(
         (video: any) => video.category === selectedCategory
       );
       setFilteredVideos(filtered);
@@ -133,10 +133,10 @@ export default function ContentVideos() {
               Upload New Content Video
             </Button>
           </div>
-          <UploadContentVideoModal
+          <UploadSubscriberVideoModal
             isOpen={isModalOpen}
             toggleModal={toggleModal}
-            onVideoUploaded={getContentVideo}
+            onVideoUploaded={getSubscriberVideo}
           />
           <div className="border shadow-sm rounded-lg">
             <div className="p-4">
